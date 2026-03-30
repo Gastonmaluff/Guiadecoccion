@@ -1,0 +1,103 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownUserPath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasUserDoc() {
+      return signedIn() && exists(ownUserPath());
+    }
+
+    function isAdmin() {
+      return hasUserDoc()
+        && get(ownUserPath()).data.role == 'admin'
+        && get(ownUserPath()).data.active == true;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function settingsPath() {
+      return /databases/$(database)/documents/settings/app;
+    }
+
+    function canBootstrapAdmin(userId) {
+      return signedIn()
+        && exists(settingsPath())
+        && get(settingsPath()).data.bootstrapAdminUid == request.auth.uid
+        && userId == request.auth.uid;
+    }
+
+    function lotVisible(lotId) {
+      return isAdmin()
+        || (
+          signedIn()
+          && exists(/databases/$(database)/documents/lots/$(lotId))
+          && request.auth.uid in get(/databases/$(database)/documents/lots/$(lotId)).data.participantIds
+        );
+    }
+
+    match /settings/app {
+      allow create: if signedIn()
+        && !exists(settingsPath())
+        && request.resource.data.bootstrapAdminUid == request.auth.uid;
+      allow read: if signedIn();
+      allow update: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || isSelf(userId);
+
+      allow create: if signedIn()
+        && isSelf(userId)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.active == true
+        && (
+          request.resource.data.role == 'operario'
+          || (request.resource.data.role == 'admin' && canBootstrapAdmin(userId))
+        );
+
+      allow update: if isAdmin()
+        || (
+          isSelf(userId)
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.active == resource.data.active
+          && request.resource.data.email == resource.data.email
+        );
+    }
+
+    match /recipes/{recipeId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+
+      match /steps/{stepId} {
+        allow read: if signedIn();
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    match /lots/{lotId} {
+      allow read: if lotVisible(lotId);
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update: if isAdmin() || lotVisible(lotId);
+
+      match /steps/{stepId} {
+        allow read: if lotVisible(lotId);
+        allow create, update: if isAdmin() || lotVisible(lotId);
+      }
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if signedIn();
+    }
+  }
+}

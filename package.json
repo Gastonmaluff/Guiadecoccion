@@ -1,0 +1,24 @@
+{
+  "name": "produccion-asistida-gomitas",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:pages": "vite build --base=/Guiadecoccion/",
+    "preview": "vite preview",
+    "seed": "node scripts/seed-demo.mjs",
+    "deploy": "npm run build:pages && gh-pages -d dist"
+  },
+  "dependencies": {
+    "firebase": "^11.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.4.1",
+    "gh-pages": "^6.1.1",
+    "vite": "^6.3.2"
+  }
+}

@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function ownUserPath() {
+      return /databases/(default)/documents/users/$(request.auth.uid);
+    }
+
+    function hasUserDoc() {
+      return signedIn() && firestore.exists(ownUserPath());
+    }
+
+    function isAdmin() {
+      return hasUserDoc()
+        && firestore.get(ownUserPath()).data.role == 'admin'
+        && firestore.get(ownUserPath()).data.active == true;
+    }
+
+    function lotVisible(lotId) {
+      return isAdmin()
+        || (
+          signedIn()
+          && firestore.exists(/databases/(default)/documents/lots/$(lotId))
+          && request.auth.uid in firestore.get(/databases/(default)/documents/lots/$(lotId)).data.participantIds
+        );
+    }
+
+    match /lots/{lotId}/steps/{stepId}/{fileName} {
+      allow read, write: if lotVisible(lotId);
+    }
+
+    match /recipes/{recipeId}/reference/{stepId}/{fileName} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
