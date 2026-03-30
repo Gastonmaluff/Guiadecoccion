@@ -1,5 +1,5 @@
-const CACHE_NAME = "gomitas-pwa-v1";
-const RUNTIME_CACHE = "gomitas-runtime-v1";
+const CACHE_NAME = "gomitas-pwa-v2";
+const RUNTIME_CACHE = "gomitas-runtime-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
