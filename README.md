@@ -154,6 +154,17 @@ npm run build
 
 El repo objetivo que me pasaste es `Gastonmaluff/Guiadecoccion`, así que el script ya contempla build con base `/Guiadecoccion/`.
 
+### Opción A: flujo automático recomendado
+
+Ya quedó agregado el workflow [deploy-pages.yml](c:/Users/gafa9/OneDrive/Escritorio/Guia%20de%20Produccion/.github/workflows/deploy-pages.yml), así que el flujo sugerido es:
+
+1. Hacer push a `main`
+2. Ir a `Settings > Pages`
+3. En `Source`, seleccionar `GitHub Actions`
+4. Cada nuevo push a `main` va a rebuildar y publicar la app
+
+### Opción B: deploy manual
+
 1. Crear build para GitHub Pages:
 
 ```bash
