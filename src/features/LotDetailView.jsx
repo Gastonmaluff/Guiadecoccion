@@ -206,7 +206,7 @@ export function LotDetailView({ lotId, profile }) {
                   ) : null}
 
                   {step.photos?.length ? (
-                    <div className="photo-grid">
+                    <div className="photo-grid photo-grid--audit">
                       {step.photos.map((photo) => (
                         <a key={photo.path} href={photo.downloadUrl} target="_blank" rel="noreferrer">
                           <img src={photo.downloadUrl} alt={photo.name} />

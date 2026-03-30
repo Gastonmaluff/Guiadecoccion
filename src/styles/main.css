@@ -514,11 +514,20 @@ small,
   gap: 12px;
 }
 
+.photo-grid--audit {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 220px));
+  justify-content: start;
+}
+
 .photo-grid a {
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--stroke);
   aspect-ratio: 1;
+}
+
+.photo-grid--audit a {
+  aspect-ratio: 4 / 3;
 }
 
 .photo-grid img,
