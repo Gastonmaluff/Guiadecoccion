@@ -81,7 +81,7 @@ export function AuthView({ mode = "login" }) {
               required
               type="password"
               placeholder="••••••••"
-              minLength={8}
+              minLength={6}
             />
           </Field>
 
