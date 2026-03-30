@@ -103,8 +103,10 @@ export function ProductionRunView({ lotId, profile }) {
       });
 
       setPhotos((current) => [...current, ...uploaded]);
-    } catch {
-      setError("No se pudieron subir las fotos. Probá nuevamente.");
+    } catch (uploadError) {
+      const code = uploadError?.code ? ` (${uploadError.code})` : "";
+      const message = uploadError?.message ? ` ${uploadError.message}` : "";
+      setError(`No se pudieron subir las fotos.${code}${message}`);
     } finally {
       setUploading(false);
       event.target.value = "";
